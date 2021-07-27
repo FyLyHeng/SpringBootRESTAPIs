@@ -3,7 +3,6 @@ package com.example.SpringBootRESTAPIs.model
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.util.*
 import javax.persistence.*
-import javax.swing.text.DateFormatter
 
 @Entity
 data class Person(

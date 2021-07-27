@@ -17,7 +17,7 @@ class PersonService(private val personRepo: PersonRepo) {
         return personRepo.findAll()
     }
 
-    fun getPerson(id:Long): Person {
+    fun getPerson(id: Long): Person {
         return personRepo.getById(id)
     }
 
@@ -25,7 +25,7 @@ class PersonService(private val personRepo: PersonRepo) {
         return personRepo.saveAndFlush(person)
     }
 
-    fun deletePerson(id: Long){
+    fun deletePerson(id: Long) {
         personRepo.deleteById(id)
     }
 
@@ -33,22 +33,17 @@ class PersonService(private val personRepo: PersonRepo) {
         return personRepo.save(person)
     }
 
-    fun findAllCriteria(name:String?,gender:String?, page:Int, size:Int): Page<Person>?{
-        return personRepo.findAll({
-                    root, _, cb ->
-                    val predicate = ArrayList<Predicate>()
-                    if (name != null){
-                        val conditionName = cb.like( root.get("name"), "%${name}%")
-                        predicate.add(conditionName)
-                    }
+    fun findAllCriteria(name: String?, gender: String?, oderBy: String, sortDirection: Sort.Direction, page: Int, size: Int): Page<Person>? {
+        return personRepo.findAll({ properties, _, criteriaBuilder ->
+            val predicate = ArrayList<Predicate>()
 
-                    if (gender != null){
-                        val qGender = cb.equal(root.get<String>("gender"),gender)
-                        predicate.add(qGender)
-                    }
+            when {
+                name != null -> predicate.add(criteriaBuilder.like(properties.get("name"), "%${name}%"))
+                gender != null -> predicate.add(criteriaBuilder.equal(properties.get<String>("gender"), gender))
+            }
 
-                    cb.and()
+            criteriaBuilder.and(*predicate.toTypedArray())
 
-                }, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"id")))
+        }, PageRequest.of(page, size, Sort.by(sortDirection, oderBy)))
     }
 }
